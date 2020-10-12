@@ -74,7 +74,7 @@ static void graph_bfs (std::vector <int> adj[], int adjlen, int start, int end) 
 
 	while (!Q.empty ()) {
 		int u = Q.front ();
-		printf ("%d ", u);
+		// printf ("%d ", u);
 		Q.pop ();
 
 		std::vector<int>::iterator it;
@@ -115,7 +115,7 @@ static void path_print (int parent[], int s, int v) {
 	}
 
 	path_print (parent, s, parent[v]);
-	printf ("%d ",v);
+	printf ("%d ", v);
 
 }
 
@@ -188,6 +188,8 @@ static unsigned int load_graph (
 				printf ("\n");
 			}
 
+			retval = 0;
+
 			fclose (file);
 		}
 
@@ -202,50 +204,10 @@ static unsigned int load_graph (
 
 #pragma endregion
 
-int main (int argc, char const **argv) {
-
-	int adjlen = 32;
-	std::vector <int> adj[adjlen];
-
-	int min = 16384, max = 0;
-
-	input_clean_stdin ();
-	printf ("\nIngresa el archivo con informacion del grafo: ");
-	char *filename = input_get_line ();
-	if (filename) {
-		load_graph (
-			adj,
-			&min, &max,
-			filename
-		);
-
-		free (filename);
-	}
-
-	// graph_add_edge (adj, 1,	2);
-	// graph_add_edge (adj, 2,	3);
-	// graph_add_edge (adj, 2,	4);
-	// graph_add_edge (adj, 3,	5);
-	// graph_add_edge (adj, 3,	7);
-	// graph_add_edge (adj, 4,	2);
-	// graph_add_edge (adj, 4,	5);
-	// graph_add_edge (adj, 5,	4);
-	// graph_add_edge (adj, 5,	6);
-	// graph_add_edge (adj, 5,	9);
-	// graph_add_edge (adj, 6,	8);
-	// graph_add_edge (adj, 7,	3);
-	// graph_add_edge (adj, 7,	6);
-	// graph_add_edge (adj, 8,	9);
-	// graph_add_edge (adj, 8,	10);
-	// graph_add_edge (adj, 8,	11);
-	// graph_add_edge (adj, 9,	5);
-	// graph_add_edge (adj, 9,	8);
-	// graph_add_edge (adj, 10, 11);
-	// graph_add_edge (adj, 11, 8);
-	// graph_add_edge (adj, 11, 10);
-	// graph_add_edge (adj, 12, 11);
+static int get_start (int min, int max) {
 
 	int start = 0;
+
 	while (1) {
 		printf ("\nIngresa el nodo inicial (%d - %d): ", min, max);
 		scanf ("%d", &start);
@@ -259,9 +221,14 @@ int main (int argc, char const **argv) {
 		}
 	}
 
-	printf ("\n");
+	return start;
+
+}
+
+static int get_end (int min, int max) {
 
 	int end = 0;
+
 	while (1) {
 		printf ("Ingresa el nodo destino (%d - %d): ", min, max);
 		scanf ("%d", &end);
@@ -275,7 +242,41 @@ int main (int argc, char const **argv) {
 		}
 	}
 
-	graph_bfs (adj, adjlen, start, end);
+	return end;
+
+}
+
+int main (int argc, char const **argv) {
+
+	int adjlen = 32;
+	std::vector <int> adj[adjlen];
+
+	int min = 16384, max = 0;
+
+	printf ("\nPractica 1 - Grafos\n");
+
+	input_clean_stdin ();
+	printf ("Ingresa el nombre del archivo con informacion del grafo: ");
+	char *filename = input_get_line ();
+	if (filename) {
+		if (!load_graph (
+			adj,
+			&min, &max,
+			filename
+		)) {
+			while (1) {
+				int start = get_start (min, max);
+
+				printf ("\n");
+
+				int end = get_end (min, max);
+
+				graph_bfs (adj, adjlen, start, end);
+			}
+		}
+
+		free (filename);
+	}
 
 	return 0;
 
