@@ -121,42 +121,129 @@ static void path_print (int parent[], int s, int v) {
 
 #pragma endregion
 
+#pragma region load
+
+static unsigned int file_get_line (FILE *file, char *line, size_t line_size) {
+
+	unsigned int retval = 1;
+
+	if (!feof (file)) {
+		if (fgets (line, line_size, file)) {
+			size_t curr = strlen (line);
+
+			if (line[curr - 1] == '\n') line[curr - 1] = '\0';
+
+			retval = 0;
+		}
+	}
+
+	return retval;
+
+}
+
+static unsigned int load_graph (
+	std::vector <int> adj[],
+	int *min, int *max,
+	const char *filename
+) {
+
+	unsigned int retval = 1;
+
+	if (filename) {
+		FILE *file = fopen (filename, "r");
+		if (file) {
+			int value = 0;
+			int one = 0, two = 0;
+			char line[1024] = { 0 };
+			char *token = NULL;
+			bool first = true;
+			while (!file_get_line (file, line, 1024)) {
+				// printf ("%s\n", line);
+
+				// we expect only 2 values
+				first = true;
+				token = strtok (line, "\t");
+				while (token) {
+					if (sscanf (token, "%d", &value) > 0) {
+						printf ("%4d", value);
+
+						if (value < *min) *min = value;
+						if (value > *max) *max = value;
+
+						if (first) {
+							one = value;
+							first = false;
+						}
+
+						else {
+							two = value;
+						}
+					}
+
+					token = strtok (NULL,"\t");
+				}
+
+				graph_add_edge (adj, one, two);
+
+				printf ("\n");
+			}
+
+			fclose (file);
+		}
+
+		else {
+			printf ("\nError al abrir el archivo: %s\n", filename);
+		}
+	}
+
+	return retval;
+
+}
+
+#pragma endregion
+
 int main (int argc, char const **argv) {
 
 	int adjlen = 32;
 	std::vector <int> adj[adjlen];
 
-	int min = 1, max = 12;
+	int min = 16384, max = 0;
 
 	input_clean_stdin ();
 	printf ("\nIngresa el archivo con informacion del grafo: ");
 	char *filename = input_get_line ();
 	if (filename) {
+		load_graph (
+			adj,
+			&min, &max,
+			filename
+		);
+
 		free (filename);
 	}
 
-	graph_add_edge (adj, 1,	2);
-	graph_add_edge (adj, 2,	3);
-	graph_add_edge (adj, 2,	4);
-	graph_add_edge (adj, 3,	5);
-	graph_add_edge (adj, 3,	7);
-	graph_add_edge (adj, 4,	2);
-	graph_add_edge (adj, 4,	5);
-	graph_add_edge (adj, 5,	4);
-	graph_add_edge (adj, 5,	6);
-	graph_add_edge (adj, 5,	9);
-	graph_add_edge (adj, 6,	8);
-	graph_add_edge (adj, 7,	3);
-	graph_add_edge (adj, 7,	6);
-	graph_add_edge (adj, 8,	9);
-	graph_add_edge (adj, 8,	10);
-	graph_add_edge (adj, 8,	11);
-	graph_add_edge (adj, 9,	5);
-	graph_add_edge (adj, 9,	8);
-	graph_add_edge (adj, 10, 11);
-	graph_add_edge (adj, 11, 8);
-	graph_add_edge (adj, 11, 10);
-	graph_add_edge (adj, 12, 11);
+	// graph_add_edge (adj, 1,	2);
+	// graph_add_edge (adj, 2,	3);
+	// graph_add_edge (adj, 2,	4);
+	// graph_add_edge (adj, 3,	5);
+	// graph_add_edge (adj, 3,	7);
+	// graph_add_edge (adj, 4,	2);
+	// graph_add_edge (adj, 4,	5);
+	// graph_add_edge (adj, 5,	4);
+	// graph_add_edge (adj, 5,	6);
+	// graph_add_edge (adj, 5,	9);
+	// graph_add_edge (adj, 6,	8);
+	// graph_add_edge (adj, 7,	3);
+	// graph_add_edge (adj, 7,	6);
+	// graph_add_edge (adj, 8,	9);
+	// graph_add_edge (adj, 8,	10);
+	// graph_add_edge (adj, 8,	11);
+	// graph_add_edge (adj, 9,	5);
+	// graph_add_edge (adj, 9,	8);
+	// graph_add_edge (adj, 10, 11);
+	// graph_add_edge (adj, 11, 8);
+	// graph_add_edge (adj, 11, 10);
+	// graph_add_edge (adj, 12, 11);
 
 	int start = 0;
 	while (1) {
@@ -171,6 +258,8 @@ int main (int argc, char const **argv) {
 			break;
 		}
 	}
+
+	printf ("\n");
 
 	int end = 0;
 	while (1) {
