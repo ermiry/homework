@@ -94,16 +94,30 @@ static void graph_bfs (std::vector <int> adj[], int adjlen, int start, int end) 
 	// 	printf ("\n");
 	// }
 
-	printf ("\n\nPath from %d to %d - ", start, end);
-	path_print (parent, start, end);
-	printf ("\n\n");
+	bool found = false;
+	for (unsigned int i = 0; i < adjlen; i++) {
+		if (parent[i] == end) {
+			found = true;
+			break;
+		}
+	}
+
+	if (found) {
+		printf ("\n\nPath from %d to %d - ", start, end);
+		path_print (parent, start, end);
+		printf ("\n\n");
+	}
+
+	else {
+		printf ("\nNo existe un camino de %d a %d\n", start, end);
+	}
 
 }
 
 static void graph_add_edge (std::vector <int> adj[], int src, int dest) {
 
 	adj[src].push_back (dest);
-	adj[dest].push_back (src);
+	// adj[dest].push_back (src);
 
 }
 
